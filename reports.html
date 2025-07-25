@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vizualizare Rapoarte ?antier</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      body { padding-bottom: 4rem; }
+      .report-card { margin: 1rem 0; }
+      .progress-bar { 
+        width: 100%; 
+        height: 20px; 
+        background-color: #f0f0f0; 
+        border-radius: 10px; 
+        overflow: hidden; 
+        margin: 1rem 0; 
+      }
+      .progress-fill { 
+        height: 100%; 
+        background-color: #4CAF50; 
+        transition: width 0.3s; 
+      }
+      .photo-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+        gap: 10px; 
+        margin: 1rem 0; 
+      }
+      .photo-item { 
+        width: 100%; 
+        height: 100px; 
+        object-fit: cover; 
+        border-radius: 4px; 
+      }
+      .loading { display: none; }
+    </style>
+  </head>
+  <body>
+    <nav class="container-fluid">
+      <ul>
+        <li><strong>Raport ?antier</strong></li>
+      </ul>
+      <ul>
+        <li><a href="index.html">Acasa</a></li>
+        <li><a href="#" class="secondary">Rapoarte</a></li>
+        <li><a href="#" role="button">Ie?ire</a></li>
+      </ul>
+    </nav>
+
+    <main class="container">
+      <div class="grid">
+        <section>
+          <hgroup>
+            <h2>Toate Rapoartele</h2>
+            <h3>Vizualizeaza ?i descarca rapoartele salvate</h3>
+          </hgroup>
+
+          <div class="loading" id="loadingBar">
+            <p>Se genereaza PDF-ul...</p>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div id="reportsContainer">
+            <p><em>Nu exista rapoarte salvate înca.</em></p>
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <button onclick="downloadAllReports()" class="outline">Descarca Toate Rapoartele (PDF)</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="container">
+      <small><a href="#">Termeni ?i condi?ii</a> • <a href="#">Contact</a></small>
+    </footer>
+
+    <script>
+      // Încarca datele din localStorage (simulare persisten?a)
+      let database = JSON.parse(localStorage.getItem('reportsDatabase') || '{}');
+
+      function displayReports() {
+        const container = document.getElementById('reportsContainer');
+        
+        if (Object.keys(database).length === 0) {
+          container.innerHTML = '<p><em>Nu exista rapoarte salvate înca.</em></p>';
+          return;
+        }
+
+        let html = '';
+        let totalReports = 0;
+
+        for (const [site, reports] of Object.entries(database)) {
+          totalReports += reports.length;
+          html += `
+            <article>
+              <header>
+                <h4>${site}</h4>
+                <small>${reports.length} rapoarte</small>
+              </header>
+              <div class="report-site">
+          `;
+
+          reports.forEach((report, index) => {
+            html += `
+              <details class="report-card">
+                <summary>${report.date} - ${report.startTime} pâna ${report.endTime}</summary>
+                <div>
+                  <p><strong>Echipa:</strong> ${report.team}</p>
+                  <p><strong>Activita?i:</strong></p>
+                  <p>${report.activities}</p>
+                  ${report.photos && report.photos.length > 0 ? `
+                    <p><strong>Fotografii:</strong> ${report.photos.length} fi?iere</p>
+                    <div class="photo-grid">
+                      ${report.photos.map(photo => {
+                        if (photo.data) {
+                          return `<img src="${photo.data}" alt="${photo.name}" class="photo-item" title="${photo.name}">`;
+                        } else {
+                          return `<div class="photo-placeholder" style="background: #f0f0f0; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><small>${photo.name || photo}</small></div>`;
+                        }
+                      }).join('')}
+                    </div>
+                  ` : ''}
+                  <button onclick="downloadSingleReport('${site}', ${index})" class="secondary outline" style="margin-top: 1rem;">Descarca acest raport (PDF)</button>
+                </div>
+              </details>
+            `;
+          });
+
+          html += `
+              </div>
+            </article>
+          `;
+        }
+
+        html = `<p><strong>Total: ${totalReports} rapoarte pentru ${Object.keys(database).length} ?antiere</strong></p>` + html;
+        container.innerHTML = html;
+      }
+
+      function showProgress(show = true) {
+        document.getElementById('loadingBar').style.display = show ? 'block' : 'none';
+      }
+
+      function updateProgress(percent) {
+        document.getElementById('progressFill').style.width = percent + '%';
+      }
+
+      async function downloadSingleReport(site, reportIndex) {
+        const report = database[site][reportIndex];
+        
+        showProgress();
+        updateProgress(20);
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Header
+        doc.setFontSize(20);
+        doc.text('Raport Zilnic ?antier', 20, 30);
+        
+        updateProgress(40);
+
+        // Site info
+        doc.setFontSize(14);
+        doc.text(`?antier: ${site}`, 20, 50);
+        doc.text(`Data: ${report.date}`, 20, 65);
+        doc.text(`Interval: ${report.startTime} - ${report.endTime}`, 20, 80);
+        doc.text(`Echipa: ${report.team}`, 20, 95);
+
+        updateProgress(60);
+
+        // Activities
+        doc.text('Activita?i:', 20, 115);
+        const splitActivities = doc.splitTextToSize(report.activities, 170);
+        doc.text(splitActivities, 20, 130);
+
+        let yPosition = 150 + splitActivities.length * 6;
+        updateProgress(70);
+
+        // Photos
+        if (report.photos && report.photos.length > 0) {
+          doc.text(`Fotografii: ${report.photos.length}`, 20, yPosition);
+          yPosition += 15;
+
+          for (let i = 0; i < report.photos.length; i++) {
+            const photo = report.photos[i];
+            
+            // Check if we need a new page
+            if (yPosition > 250) {
+              doc.addPage();
+              yPosition = 30;
+            }
+
+            if (photo.data && photo.data.startsWith('data:image/')) {
+              try {
+                // Add image to PDF
+                const imgWidth = 150;
+                const imgHeight = 100;
+                
+                doc.addImage(photo.data, 'JPEG', 20, yPosition, imgWidth, imgHeight);
+                yPosition += imgHeight + 10;
+                
+                // Add photo name
+                doc.setFontSize(10);
+                doc.text(`Fotografia: ${photo.name}`, 20, yPosition);
+                doc.setFontSize(14);
+                yPosition += 15;
+              } catch (error) {
+                console.error('Eroare la adaugarea imaginii în PDF:', error);
+                doc.text(`• ${photo.name} (eroare la încarcare)`, 25, yPosition);
+                yPosition += 8;
+              }
+            } else {
+              // Fallback for old format or missing data
+              doc.text(`• ${photo.name || photo}`, 25, yPosition);
+              yPosition += 8;
+            }
+          }
+        }
+
+        updateProgress(100);
+
+        // Save PDF
+        doc.save(`Raport_${site.replace(/[^a-zA-Z0-9]/g, '_')}_${report.date}.pdf`);
+        
+        setTimeout(() => showProgress(false), 500);
+      }
+
+      async function downloadAllReports() {
+        if (Object.keys(database).length === 0) {
+          alert('Nu exista rapoarte de descarcat!');
+          return;
+        }
+
+        showProgress();
+        updateProgress(10);
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        let yPosition = 30;
+        let pageNumber = 1;
+
+        // Title page
+        doc.setFontSize(24);
+        doc.text('Rapoarte Complete ?antiere', 20, yPosition);
+        yPosition += 20;
+
+        doc.setFontSize(12);
+        doc.text(`Generat la: ${new Date().toLocaleDateString('ro-RO')}`, 20, yPosition);
+        yPosition += 20;
+
+        let totalReports = Object.values(database).reduce((sum, reports) => sum + reports.length, 0);
+        let processedReports = 0;
+
+        for (const [site, reports] of Object.entries(database)) {
+          // Check if we need a new page
+          if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 30;
+            pageNumber++;
+          }
+
+          // Site header
+          doc.setFontSize(16);
+          doc.text(`?antier: ${site}`, 20, yPosition);
+          yPosition += 15;
+
+          for (const report of reports) {
+            // Check if we need a new page for this report
+            if (yPosition > 230) {
+              doc.addPage();
+              yPosition = 30;
+              pageNumber++;
+            }
+
+            doc.setFontSize(12);
+            doc.text(`Data: ${report.date} | ${report.startTime} - ${report.endTime}`, 25, yPosition);
+            yPosition += 10;
+            
+            doc.text(`Echipa: ${report.team}`, 25, yPosition);
+            yPosition += 10;
+
+            doc.text('Activita?i:', 25, yPosition);
+            yPosition += 8;
+            
+            const splitActivities = doc.splitTextToSize(report.activities, 160);
+            doc.text(splitActivities, 30, yPosition);
+            yPosition += splitActivities.length * 6 + 5;
+
+            if (report.photos && report.photos.length > 0) {
+              doc.text(`Fotografii: ${report.photos.length}`, 25, yPosition);
+              yPosition += 10;
+
+              for (const photo of report.photos) {
+                // Check if we need a new page
+                if (yPosition > 200) {
+                  doc.addPage();
+                  yPosition = 30;
+                }
+
+                if (photo.data && photo.data.startsWith('data:image/')) {
+                  try {
+                    // Add smaller images for the complete report
+                    const imgWidth = 80;
+                    const imgHeight = 60;
+                    
+                    doc.addImage(photo.data, 'JPEG', 30, yPosition, imgWidth, imgHeight);
+                    yPosition += imgHeight + 5;
+                    
+                    // Add photo name
+                    doc.setFontSize(8);
+                    doc.text(photo.name, 30, yPosition);
+                    doc.setFontSize(12);
+                    yPosition += 10;
+                  } catch (error) {
+                    console.error('Eroare la adaugarea imaginii:', error);
+                    doc.text(`• ${photo.name} (eroare)`, 30, yPosition);
+                    yPosition += 6;
+                  }
+                } else {
+                  // Fallback for old format
+                  doc.text(`• ${photo.name || photo}`, 30, yPosition);
+                  yPosition += 6;
+                }
+              }
+            }
+
+            yPosition += 10; // Space between reports
+
+            processedReports++;
+            updateProgress(10 + (processedReports / totalReports) * 85);
+          }
+
+          yPosition += 10; // Extra space between sites
+        }
+
+        updateProgress(100);
+
+        // Save the complete PDF
+        doc.save(`Rapoarte_Complete_${new Date().toISOString().split('T')[0]}.pdf`);
+        
+        setTimeout(() => showProgress(false), 500);
+      }
+
+      // Load reports on page load
+      window.addEventListener('load', () => {
+        displayReports();
+      });
+
+      // Refresh data every 5 seconds to catch updates from main page
+      setInterval(() => {
+        database = JSON.parse(localStorage.getItem('reportsDatabase') || '{}');
+        displayReports();
+      }, 5000);
+    </script>
+  </body>
+</html>
