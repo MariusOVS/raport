@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Raport Zilnic Șantier</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+    <style>
+      body { padding-bottom: 4rem; }
+      form input, form textarea { margin-bottom: 1rem; }
+    </style>
+  </head>
+  <body>
+    <nav class="container-fluid">
+      <ul>
+        <li><strong>Raport Șantier</strong></li>
+      </ul>
+      <ul>
+        <li><a href="#">Acasă</a></li>
+        <li><a href="reports.html">Rapoarte</a></li>
+        <li><a href="#" role="button">Ieșire</a></li>
+      </ul>
+    </nav>
+
+    <main class="container">
+      <div class="grid">
+        <section>
+          <hgroup>
+            <h2>Raport Zilnic</h2>
+            <h3>Completează datele de mai jos</h3>
+          </hgroup>
+
+          <form id="reportForm">
+            <label for="siteAddress">Adresă Șantier</label>
+            <input type="text" id="siteAddress" name="siteAddress" placeholder="Ex: Str. Constructorilor 12" required />
+
+            <label for="date">Data</label>
+            <input type="date" id="date" name="date" required />
+
+            <label for="startTime">Ora Sosire</label>
+            <input type="time" id="startTime" name="startTime" required />
+
+            <label for="team">Echipa</label>
+            <input type="text" id="team" name="team" placeholder="Ex: Echipa A, 5 muncitori" required />
+
+            <label for="activities">Activități</label>
+            <textarea id="activities" name="activities" placeholder="Descriere activități..." required></textarea>
+
+            <label for="endTime">Ora Plecare</label>
+            <input type="time" id="endTime" name="endTime" required />
+
+            <label for="photos">Fotografii</label>
+            <input type="file" id="photos" name="photos" accept="image/*" multiple />
+
+            <button type="submit">Salvează Raportul</button>
+          </form>
+
+          <div id="confirmation" style="display:none; margin-top: 2rem;"></div>
+        </section>
+      </div>
+    </main>
+
+    <section aria-label="Subscribe example">
+      <div class="container">
+        <article>
+          <hgroup>
+            <h2>Primește notificări</h2>
+            <h3>Abonează-te pentru actualizări privind rapoartele</h3>
+          </hgroup>
+          <form class="grid">
+            <input type="text" id="firstname" name="firstname" placeholder="Prenume" aria-label="Prenume" required />
+            <input type="email" id="email" name="email" placeholder="Email" aria-label="Email" required />
+            <button type="submit" onclick="event.preventDefault()">Abonează-te</button>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <footer class="container">
+      <small><a href="#">Termeni și condiții</a> • <a href="#">Contact</a></small>
+    </footer>
+
+    <script>
+      // Load existing database from localStorage
+      let database = JSON.parse(localStorage.getItem('reportsDatabase') || '{}');
+
+      document.getElementById("reportForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const site = document.getElementById("siteAddress").value;
+        const report = {
+          date: document.getElementById("date").value,
+          startTime: document.getElementById("startTime").value,
+          team: document.getElementById("team").value,
+          activities: document.getElementById("activities").value,
+          endTime: document.getElementById("endTime").value,
+          photos: Array.from(document.getElementById("photos").files).map(f => f.name)
+        };
+
+        if (!database[site]) {
+          database[site] = [];
+        }
+
+        database[site].push(report);
+
+        // Save to localStorage for persistence
+        localStorage.setItem('reportsDatabase', JSON.stringify(database));
+
+        document.getElementById("confirmation").style.display = "block";
+        document.getElementById("confirmation").innerHTML =
+          `<article><hgroup><h3>Raport salvat!</h3><h4>${site} - ${report.date}</h4></hgroup><p>Număr total de rapoarte pentru acest șantier: ${database[site].length}</p><p><a href="reports.html">Vezi toate rapoartele →</a></p></article>`;
+
+        document.getElementById("reportForm").reset();
+      });
+    </script>
+  </body>
+</html>
