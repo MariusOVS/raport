@@ -1,117 +1,162 @@
 <!DOCTYPE html>
 <html lang="ro">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Raport Zilnic Șantier</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
-    <style>
-      body { padding-bottom: 4rem; }
-      form input, form textarea { margin-bottom: 1rem; }
-    </style>
-  </head>
-  <body>
-    <nav class="container-fluid">
-      <ul>
-        <li><strong>Raport Șantier</strong></li>
-      </ul>
-      <ul>
-        <li><a href="#">Acasă</a></li>
-        <li><a href="reports.html">Rapoarte</a></li>
-        <li><a href="#" role="button">Ieșire</a></li>
-      </ul>
-    </nav>
 
-    <main class="container">
-      <div class="grid">
-        <section>
-          <hgroup>
-            <h2>Raport Zilnic</h2>
-            <h3>Completează datele de mai jos</h3>
-          </hgroup>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Raport Zilnic Șantier</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+  <style>
+    body {
+      padding-bottom: 4rem;
+    }
 
-          <form id="reportForm">
-            <label for="siteAddress">Adresă Șantier</label>
-            <input type="text" id="siteAddress" name="siteAddress" placeholder="Ex: Str. Constructorilor 12" required />
+    form input,
+    form textarea {
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
 
-            <label for="date">Data</label>
-            <input type="date" id="date" name="date" required />
+<body>
+  <nav class="container-fluid">
+    <ul>
+      <li><strong>Raport Șantier</strong></li>
+    </ul>
+    <ul>
+      <li><a href="#">Acasă</a></li>
+      <li><a href="#" onclick="goToReports()" id="reportsLink">Rapoarte</a></li>
+    </ul>
+  </nav>
 
-            <label for="startTime">Ora Sosire</label>
-            <input type="time" id="startTime" name="startTime" required />
+  <main class="container">
+    <div class="grid">
+      <section>
+        <hgroup>
+          <h2>Raport Zilnic</h2>
+          <h3>Completeaza datele de mai jos</h3>
+        </hgroup>
 
-            <label for="team">Echipa</label>
-            <input type="text" id="team" name="team" placeholder="Ex: Echipa A, 5 muncitori" required />
+        <form id="reportForm">
+          <label for="siteAddress">Adresa Santier</label>
+          <input type="text" id="siteAddress" name="siteAddress" placeholder="Ex: Str. Constructorilor 12" required />
 
-            <label for="activities">Activități</label>
-            <textarea id="activities" name="activities" placeholder="Descriere activități..." required></textarea>
+          <label for="date">Data</label>
+          <input type="date" id="date" name="date" required />
 
-            <label for="endTime">Ora Plecare</label>
-            <input type="time" id="endTime" name="endTime" required />
+          <label for="startTime">Ora Sosire</label>
+          <input type="time" id="startTime" name="startTime" required />
 
-            <label for="photos">Fotografii</label>
-            <input type="file" id="photos" name="photos" accept="image/*" multiple />
+          <label for="team">Echipa</label>
+          <input type="text" id="team" name="team" placeholder="Ex: Echipa A, 5 muncitori" required />
 
-            <button type="submit">Salvează Raportul</button>
-          </form>
+          <label for="activities">Activitati</label>
+          <textarea id="activities" name="activities" placeholder="Descriere activități..." required></textarea>
 
-          <div id="confirmation" style="display:none; margin-top: 2rem;"></div>
-        </section>
-      </div>
-    </main>
+          <label for="endTime">Ora Plecare</label>
+          <input type="time" id="endTime" name="endTime" required />
 
-    <section aria-label="Subscribe example">
-      <div class="container">
-        <article>
-          <hgroup>
-            <h2>Primește notificări</h2>
-            <h3>Abonează-te pentru actualizări privind rapoartele</h3>
-          </hgroup>
-          <form class="grid">
-            <input type="text" id="firstname" name="firstname" placeholder="Prenume" aria-label="Prenume" required />
-            <input type="email" id="email" name="email" placeholder="Email" aria-label="Email" required />
-            <button type="submit" onclick="event.preventDefault()">Abonează-te</button>
-          </form>
-        </article>
-      </div>
-    </section>
+          <label for="photos">Fotografii</label>
+          <input type="file" id="photos" name="photos" accept="image/*" multiple />
 
-    <footer class="container">
-      <small><a href="#">Termeni și condiții</a> • <a href="#">Contact</a></small>
-    </footer>
+          <button type="submit">Salveaza Raportul</button>
+        </form>
 
-    <script>
-      // Load existing database from localStorage
-      let database = JSON.parse(localStorage.getItem('reportsDatabase') || '{}');
+        <div id="confirmation" style="display:none; margin-top: 2rem;"></div>
+      </section>
+    </div>
+  </main>
 
-      document.getElementById("reportForm").addEventListener("submit", function (e) {
-        e.preventDefault();
+  <section aria-label="Subscribe example">
+    <div class="container">
+      <article>
+        <hgroup>
+          <h2>Primeste notificari</h2>
+          <h3>Abonează-te pentru actualizări privind rapoartele</h3>
+        </hgroup>
+        <form class="grid">
+          <input type="text" id="firstname" name="firstname" placeholder="Prenume" aria-label="Prenume" required />
+          <input type="email" id="email" name="email" placeholder="Email" aria-label="Email" required />
+          <button type="submit" onclick="event.preventDefault()">Abonează-te</button>
+        </form>
+      </article>
+    </div>
+  </section>
 
-        const site = document.getElementById("siteAddress").value;
-        const report = {
-          date: document.getElementById("date").value,
-          startTime: document.getElementById("startTime").value,
-          team: document.getElementById("team").value,
-          activities: document.getElementById("activities").value,
-          endTime: document.getElementById("endTime").value,
-          photos: Array.from(document.getElementById("photos").files).map(f => f.name)
-        };
+  <footer class="container">
+    <small><a href="#">Termeni și conditii</a> • <a href="#">Contact</a></small>
+  </footer>
 
-        if (!database[site]) {
-          database[site] = [];
-        }
+  <script>
+    // Load existing database from localStorage
+    let database = JSON.parse(localStorage.getItem('reportsDatabase') || '{}');
 
-        database[site].push(report);
+    // Redirecționează direct către rapoarte
+    function goToReports() {
+      window.location.href = 'reports.html';
+    }
 
-        // Save to localStorage for persistence
-        localStorage.setItem('reportsDatabase', JSON.stringify(database));
-
-        document.getElementById("confirmation").style.display = "block";
-        document.getElementById("confirmation").innerHTML =
-          `<article><hgroup><h3>Raport salvat!</h3><h4>${site} - ${report.date}</h4></hgroup><p>Număr total de rapoarte pentru acest șantier: ${database[site].length}</p><p><a href="reports.html">Vezi toate rapoartele →</a></p></article>`;
-
-        document.getElementById("reportForm").reset();
+    // Function to convert file to base64
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
       });
-    </script>
-  </body>
+    }
+
+    document.getElementById("reportForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const site = document.getElementById("siteAddress").value;
+      const photoFiles = Array.from(document.getElementById("photos").files);
+
+      // Convert photos to base64
+      const photos = [];
+      for (const file of photoFiles) {
+        try {
+          const base64 = await fileToBase64(file);
+          photos.push({
+            name: file.name,
+            data: base64,
+            type: file.type
+          });
+        } catch (error) {
+          console.error('Eroare la convertirea fotografiei:', error);
+        }
+      }
+
+      const report = {
+        date: document.getElementById("date").value,
+        startTime: document.getElementById("startTime").value,
+        team: document.getElementById("team").value,
+        activities: document.getElementById("activities").value,
+        endTime: document.getElementById("endTime").value,
+        photos: photos
+      };
+
+      if (!database[site]) {
+        database[site] = [];
+      }
+
+      database[site].push(report);
+
+      // Save to localStorage for persistence
+      localStorage.setItem('reportsDatabase', JSON.stringify(database));
+
+      document.getElementById("confirmation").style.display = "block";
+      document.getElementById("confirmation").innerHTML =
+        `<article><hgroup><h3>Raport salvat!</h3><h4>${site} - ${report.date}</h4></hgroup><p>Număr total de rapoarte pentru acest șantier: ${database[site].length}</p><p><a href="#" onclick="goToReports()">Vezi toate rapoartele →</a></p></article>`;
+
+      document.getElementById("reportForm").reset();
+    });
+
+    // Page loaded
+    window.addEventListener('load', () => {
+      console.log('Aplicația a fost încărcată cu succes!');
+    });
+  </script>
+</body>
+
 </html>
