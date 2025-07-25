@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ro">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vizualizare Rapoarte ?antier</title>
+    <title>Vizualizare Rapoarte Șantier</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -41,12 +40,11 @@
   <body>
     <nav class="container-fluid">
       <ul>
-        <li><strong>Raport ?antier</strong></li>
+        <li><strong>Raport Șantier</strong></li>
       </ul>
       <ul>
-        <li><a href="index.html">Acasa</a></li>
+        <li><a href="index.html">Acasă</a></li>
         <li><a href="#" class="secondary">Rapoarte</a></li>
-        <li><a href="#" role="button">Ie?ire</a></li>
       </ul>
     </nav>
 
@@ -55,40 +53,40 @@
         <section>
           <hgroup>
             <h2>Toate Rapoartele</h2>
-            <h3>Vizualizeaza ?i descarca rapoartele salvate</h3>
+            <h3>Vizualizează și descarcă rapoartele salvate</h3>
           </hgroup>
 
           <div class="loading" id="loadingBar">
-            <p>Se genereaza PDF-ul...</p>
+            <p>Se generează PDF-ul...</p>
             <div class="progress-bar">
               <div class="progress-fill" id="progressFill" style="width: 0%"></div>
             </div>
           </div>
 
           <div id="reportsContainer">
-            <p><em>Nu exista rapoarte salvate �nca.</em></p>
+            <p><em>Nu există rapoarte salvate încă.</em></p>
           </div>
 
           <div style="margin-top: 2rem;">
-            <button onclick="downloadAllReports()" class="outline">Descarca Toate Rapoartele (PDF)</button>
+            <button onclick="downloadAllReports()" class="outline">Descarcă Toate Rapoartele (PDF)</button>
           </div>
         </section>
       </div>
     </main>
 
     <footer class="container">
-      <small><a href="#">Termeni ?i condi?ii</a> � <a href="#">Contact</a></small>
+      <small><a href="#">Termeni și condiții</a> • <a href="#">Contact</a></small>
     </footer>
 
     <script>
-      // �ncarca datele din localStorage (simulare persisten?a)
+      // Încarcă datele din localStorage (simulare persistență)
       let database = JSON.parse(localStorage.getItem('reportsDatabase') || '{}');
 
       function displayReports() {
         const container = document.getElementById('reportsContainer');
         
         if (Object.keys(database).length === 0) {
-          container.innerHTML = '<p><em>Nu exista rapoarte salvate �nca.</em></p>';
+          container.innerHTML = '<p><em>Nu există rapoarte salvate încă.</em></p>';
           return;
         }
 
@@ -109,13 +107,13 @@
           reports.forEach((report, index) => {
             html += `
               <details class="report-card">
-                <summary>${report.date} - ${report.startTime} p�na ${report.endTime}</summary>
+                <summary>${report.date} - ${report.startTime} până ${report.endTime}</summary>
                 <div>
                   <p><strong>Echipa:</strong> ${report.team}</p>
-                  <p><strong>Activita?i:</strong></p>
+                  <p><strong>Activități:</strong></p>
                   <p>${report.activities}</p>
                   ${report.photos && report.photos.length > 0 ? `
-                    <p><strong>Fotografii:</strong> ${report.photos.length} fi?iere</p>
+                    <p><strong>Fotografii:</strong> ${report.photos.length} fișiere</p>
                     <div class="photo-grid">
                       ${report.photos.map(photo => {
                         if (photo.data) {
@@ -126,7 +124,7 @@
                       }).join('')}
                     </div>
                   ` : ''}
-                  <button onclick="downloadSingleReport('${site}', ${index})" class="secondary outline" style="margin-top: 1rem;">Descarca acest raport (PDF)</button>
+                  <button onclick="downloadSingleReport('${site}', ${index})" class="secondary outline" style="margin-top: 1rem;">Descarcă acest raport (PDF)</button>
                 </div>
               </details>
             `;
@@ -138,7 +136,7 @@
           `;
         }
 
-        html = `<p><strong>Total: ${totalReports} rapoarte pentru ${Object.keys(database).length} ?antiere</strong></p>` + html;
+        html = `<p><strong>Total: ${totalReports} rapoarte pentru ${Object.keys(database).length} șantiere</strong></p>` + html;
         container.innerHTML = html;
       }
 
@@ -161,13 +159,13 @@
 
         // Header
         doc.setFontSize(20);
-        doc.text('Raport Zilnic ?antier', 20, 30);
+        doc.text('Raport Zilnic Șantier', 20, 30);
         
         updateProgress(40);
 
         // Site info
         doc.setFontSize(14);
-        doc.text(`?antier: ${site}`, 20, 50);
+        doc.text(`Șantier: ${site}`, 20, 50);
         doc.text(`Data: ${report.date}`, 20, 65);
         doc.text(`Interval: ${report.startTime} - ${report.endTime}`, 20, 80);
         doc.text(`Echipa: ${report.team}`, 20, 95);
@@ -175,7 +173,7 @@
         updateProgress(60);
 
         // Activities
-        doc.text('Activita?i:', 20, 115);
+        doc.text('Activități:', 20, 115);
         const splitActivities = doc.splitTextToSize(report.activities, 170);
         doc.text(splitActivities, 20, 130);
 
@@ -211,13 +209,13 @@
                 doc.setFontSize(14);
                 yPosition += 15;
               } catch (error) {
-                console.error('Eroare la adaugarea imaginii �n PDF:', error);
-                doc.text(`� ${photo.name} (eroare la �ncarcare)`, 25, yPosition);
+                console.error('Eroare la adăugarea imaginii în PDF:', error);
+                doc.text(`• ${photo.name} (eroare la încărcare)`, 25, yPosition);
                 yPosition += 8;
               }
             } else {
               // Fallback for old format or missing data
-              doc.text(`� ${photo.name || photo}`, 25, yPosition);
+              doc.text(`• ${photo.name || photo}`, 25, yPosition);
               yPosition += 8;
             }
           }
@@ -233,7 +231,7 @@
 
       async function downloadAllReports() {
         if (Object.keys(database).length === 0) {
-          alert('Nu exista rapoarte de descarcat!');
+          alert('Nu există rapoarte de descărcat!');
           return;
         }
 
@@ -248,7 +246,7 @@
 
         // Title page
         doc.setFontSize(24);
-        doc.text('Rapoarte Complete ?antiere', 20, yPosition);
+        doc.text('Rapoarte Complete Șantiere', 20, yPosition);
         yPosition += 20;
 
         doc.setFontSize(12);
@@ -268,7 +266,7 @@
 
           // Site header
           doc.setFontSize(16);
-          doc.text(`?antier: ${site}`, 20, yPosition);
+          doc.text(`Șantier: ${site}`, 20, yPosition);
           yPosition += 15;
 
           for (const report of reports) {
@@ -286,7 +284,7 @@
             doc.text(`Echipa: ${report.team}`, 25, yPosition);
             yPosition += 10;
 
-            doc.text('Activita?i:', 25, yPosition);
+            doc.text('Activități:', 25, yPosition);
             yPosition += 8;
             
             const splitActivities = doc.splitTextToSize(report.activities, 160);
@@ -319,13 +317,13 @@
                     doc.setFontSize(12);
                     yPosition += 10;
                   } catch (error) {
-                    console.error('Eroare la adaugarea imaginii:', error);
-                    doc.text(`� ${photo.name} (eroare)`, 30, yPosition);
+                    console.error('Eroare la adăugarea imaginii:', error);
+                    doc.text(`• ${photo.name} (eroare)`, 30, yPosition);
                     yPosition += 6;
                   }
                 } else {
                   // Fallback for old format
-                  doc.text(`� ${photo.name || photo}`, 30, yPosition);
+                  doc.text(`• ${photo.name || photo}`, 30, yPosition);
                   yPosition += 6;
                 }
               }
